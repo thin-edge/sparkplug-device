@@ -3,7 +3,7 @@ services:
     image: ghcr.io/thin-edge/spdevice-ttyd:latest
     restart: unless-stopped
     # Still using host mode to make the web UI accessible on the host IP
-    network_mode: "host"
+    network_mode: host
 
     # Run as a non-root user (UID 1000 is standard for the first host user)
     user: "1000:1000"

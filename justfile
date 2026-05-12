@@ -41,6 +41,9 @@ clean:
     rm -f spdevice
     rm -rf dist/
 
+docker-setup:
+    docker run --privileged --rm tonistiigi/binfmt --install all
+
 # Build release binaries locally via goreleaser (requires goreleaser)
-release-snapshot:
+release-snapshot: docker-setup
     goreleaser release --snapshot --clean
