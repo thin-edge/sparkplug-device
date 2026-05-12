@@ -935,6 +935,13 @@ func truncate(s string, maxW int) string {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
+func envOrDefault(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
+}
+
 // runHeadless runs the device simulator without a TUI, suitable for use as a
 // system service.  It publishes Sparkplug B / thin‑edge.io data on the
 // configured interval and exits cleanly on SIGINT or SIGTERM.
@@ -995,12 +1002,25 @@ func (m *Model) runHeadless() {
 }
 
 func main() {
-	broker := flag.String("broker", "localhost:1883", "MQTT broker host:port")
-	mode := flag.String("mode", "sparkplug", `Publish mode: "sparkplug" (direct Sparkplug B) or "tedge" (thin-edge.io topics)`)
-	groupId := flag.String("group", "tedge", "Sparkplug B Group ID (sparkplug mode only)")
-	edgeNodeId := flag.String("node", "sim-cnc01", "Edge node / device ID")
-	interval := flag.Duration("interval", 5*time.Second, "Minimum publish interval (e.g. 1s, 500ms, 5s)")
-	headless := flag.Bool("headless", false, "Run without TUI (suitable for use as a system service)")
+	// Resolve defaults: flags > environment variables > hardcoded defaults.
+	brokerDefault := envOrDefault("SPDEVICE_BROKER", "localhost:1883")
+	modeDefault := envOrDefault("SPDEVICE_MODE", "sparkplug")
+	groupDefault := envOrDefault("SPDEVICE_GROUP", "tedge")
+	nodeDefault := envOrDefault("SPDEVICE_NODE", "sim-cnc01")
+	intervalDefault := 5 * time.Second
+	if v := os.Getenv("SPDEVICE_INTERVAL"); v != "" {
+		if d, err := time.ParseDuration(v); err == nil {
+			intervalDefault = d
+		}
+	}
+	headlessDefault := os.Getenv("SPDEVICE_HEADLESS") == "true" || os.Getenv("SPDEVICE_HEADLESS") == "1"
+
+	broker := flag.String("broker", brokerDefault, "MQTT broker host:port (env: SPDEVICE_BROKER)")
+	mode := flag.String("mode", modeDefault, `Publish mode: "sparkplug" (direct Sparkplug B) or "tedge" (thin-edge.io topics) (env: SPDEVICE_MODE)`)
+	groupId := flag.String("group", groupDefault, "Sparkplug B Group ID (sparkplug mode only) (env: SPDEVICE_GROUP)")
+	edgeNodeId := flag.String("node", nodeDefault, "Edge node / device ID (env: SPDEVICE_NODE)")
+	interval := flag.Duration("interval", intervalDefault, "Minimum publish interval (e.g. 1s, 500ms, 5s) (env: SPDEVICE_INTERVAL)")
+	headless := flag.Bool("headless", headlessDefault, "Run without TUI (suitable for use as a system service) (env: SPDEVICE_HEADLESS)")
 	flag.Parse()
 
 	if *mode != "sparkplug" && *mode != "tedge" {
