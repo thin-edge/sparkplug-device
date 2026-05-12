@@ -5,7 +5,7 @@ services:
 
     # Expose the ttyd port to the host
     ports:
-      - "7681:7681"
+      - "127.0.0.1:7681:7681"
 
     # Run as a non-root user (UID 1000 is standard for the first host user)
     user: "1000:1000"
@@ -15,7 +15,7 @@ services:
       - ALL
 
     environment:
-      - SPDEVICE_BROKER=${SPDEVICE_BROKER:-host.containers.internal}
+      - SPDEVICE_BROKER=${SPDEVICE_BROKER:-host.containers.internal:1883}
 
     # required when using docker    
     # extra_hosts:
