@@ -23,11 +23,19 @@ builds:
       - arm64
       - amd64
       - "386"
+      - arm
+    goarm:
+      - "6"
+      - "7"
     ignore:
       - goos: darwin
         goarch: "386"
+      - goos: darwin
+        goarch: arm
       - goos: windows
         goarch: arm64
+      - goos: windows
+        goarch: arm
 
 archives:
   - ids:
@@ -58,6 +66,29 @@ changelog:
       - "^chore:"
       - Merge pull request
       - Merge branch
+
+dockers_v2:
+  - id: spdevice-ttyd
+    ids:
+      - spdevice
+    dockerfile: Dockerfile.ttyd
+    images:
+      - "ghcr.io/thin-edge/spdevice-ttyd"
+    tags:
+      - "{{ .Tag }}"
+      - "v{{ .Major }}"
+      - "{{ if not .IsNightly }}latest{{ end }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+      - linux/arm/v7
+      - linux/arm/v6
+    labels:
+      "org.opencontainers.image.description": "Sparkplug B CNC device simulator with ttyd web terminal"
+      "org.opencontainers.image.created": "{{.Date}}"
+      "org.opencontainers.image.revision": "{{.FullCommit}}"
+      "org.opencontainers.image.version": "{{.Version}}"
+      "org.opencontainers.image.source": "{{.GitURL}}"
 
 release:
   draft: false
