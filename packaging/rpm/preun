@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+# $1 == 0 : final removal
+# $1 == 1 : upgrade (new version is being installed alongside)
+
+if [ "$1" -eq 0 ]; then
+    if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+        systemctl stop spdevice || true
+        systemctl disable spdevice || true
+    fi
+fi

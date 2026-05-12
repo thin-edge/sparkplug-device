@@ -1,0 +1,23 @@
+[Unit]
+Description=Sparkplug B CNC Device Simulator
+Documentation=https://github.com/thin-edge/tedge-flows-examples
+After=network.target
+
+[Service]
+Type=simple
+User=nobody
+EnvironmentFile=/etc/spdevice/spdevice.env
+ExecStart=/usr/bin/spdevice --headless \
+    --broker ${SPDEVICE_BROKER} \
+    --mode   ${SPDEVICE_MODE} \
+    --group  ${SPDEVICE_GROUP} \
+    --node   ${SPDEVICE_NODE} \
+    --interval ${SPDEVICE_INTERVAL}
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=spdevice
+
+[Install]
+WantedBy=multi-user.target

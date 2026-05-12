@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+# $1 == 1 : new install
+# $1 == 2 : upgrade
+
+if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+    systemctl daemon-reload || true
+    systemctl enable spdevice || true
+    systemctl start spdevice || true
+fi

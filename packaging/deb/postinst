@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+# Enable and start the service if systemd is available and running.
+# The -d /run/systemd/system check is the lightest reliable indicator that
+# systemd is the active init, without requiring systemctl to be on PATH.
+
+case "$1" in
+    configure|abort-upgrade|abort-deconfigure|abort-remove)
+        if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+            systemctl daemon-reload || true
+            systemctl enable spdevice || true
+            systemctl start spdevice || true
+        fi
+        ;;
+esac

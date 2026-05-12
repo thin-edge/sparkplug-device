@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+# $1 == 0 : final removal
+
+if [ "$1" -eq 0 ]; then
+    if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+        systemctl daemon-reload || true
+        systemctl reset-failed spdevice 2>/dev/null || true
+    fi
+fi
