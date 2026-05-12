@@ -6,20 +6,20 @@ rebirth commands from host applications or [spmon](../spmon).
 
 ```
 spdevice  ● Connected  localhost:1883  group:tedge  node:sim-cnc01  seq:14  pub:3
-┌─ Machine State: RUNNING  [32s]  prog: O1001_ROUGH ─────────────┐ ┌─ Event Log ───────────────┐
-│                                                                │ │ 10:14:21 ● program_start  │
-│ Spindle                                                        │ │   Starting O1001_ROUGH    │
-│   speed.rpm       7,843.0 rpm  ████████░░                      │ │ 10:14:08 ● door_close     │
-│   load.pct           63.2 %   ███████░░░                       │ │ 10:14:06 ● door_open      │
-│   temp.celsius       68.4 °C  ████░░░░░░                       │ │ 10:14:04 ● program_end    │
-│                                                                │ │   O3003_PROFILE — parts:4 │
-│ Feed & Motion                                                  │ │ 10:13:52 ◈ HighSpindleTemp│
-│   feed.rate        782.0 mm/min                                │ │           RAISED          │
-│   axis.x.pos       103.4 mm                                    │ │ 10:12:19 ◇ HighSpindleTemp│
-│   axis.y.pos        55.0 mm                                    │ │           cleared         │
-│   axis.z.pos        12.9 mm                                    │ │ 10:11:44 ● tool_change    │
-│                                                                │ │   Tool change → T07       │
-│ Coolant                                                        │ └──────────────────────────-┘
+┌─ Machine State: RUNNING  [32s]  prog: O1001_ROUGH ───┐ ┌─ Event Log ───────────────┐
+│                                                      │ │ 10:14:21 ● program_start  │
+│ Spindle                                              │ │   Starting O1001_ROUGH    │
+│   speed.rpm       7,843.0 rpm  ████████░░            │ │ 10:14:08 ● door_close     │
+│   load.pct           63.2 %   ███████░░░             │ │ 10:14:06 ● door_open      │
+│   temp.celsius       68.4 °C  ████░░░░░░             │ │ 10:14:04 ● program_end    │
+│                                                      │ │   O3003_PROFILE — parts:4 │
+│ Feed & Motion                                        │ │ 10:13:52 ◈ HighSpindleTemp│
+│   feed.rate        782.0 mm/min                      │ │           RAISED          │
+│   axis.x.pos       103.4 mm                          │ │ 10:12:19 ◇ HighSpindleTemp│
+│   axis.y.pos        55.0 mm                          │ │           cleared         │
+│   axis.z.pos        12.9 mm                          │ │ 10:11:44 ● tool_change    │
+│                                                      │ │   Tool change → T07       │
+│ Coolant                                              │ └──────────────────────────-┘
 │   temp.celsius       26.1 °C
 │   flow.lpm            8.2 L/min  ██████░░░░
 │
@@ -42,15 +42,14 @@ spdevice  ● Connected  localhost:1883  group:tedge  node:sim-cnc01  seq:14  pu
 │   LowCoolantFlow     false
 │   HighHydraulicPressure false
 │   EStop              false
-└─────────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────┘
   interval:5s  next: 2.1s  p pause    r rebirth    q quit
 ```
 
 ## Build
 
 ```sh
-cd tools/spdevice
-go build -o spdevice .
+just build
 ```
 
 ## Usage
@@ -115,16 +114,3 @@ IDLE → WARMUP → RUNNING → COOLDOWN → IDLE
 **RUNNING**: Full machining — spindle at target speed, axes executing path, all coolant and hydraulics active.  
 **COOLDOWN**: Spindle decelerating, door briefly opens for part removal, tool change on next cycle start.  
 **FAULT**: E-stop triggered (rare random event or thermal runaway), all motion stops.
-
-## End-to-end test
-
-```sh
-# Terminal 1 – watch Sparkplug B output
-cd tools/spmon && ./spmon --group tedge --node sim-cnc01
-
-# Terminal 2 – run the device simulator
-cd tools/spdevice && ./spdevice --interval 2s
-```
-
-Press `R` in spmon to send an NCMD rebirth command — spdevice will respond with
-a fresh NBIRTH containing all current metric values and aliases.
