@@ -7,12 +7,7 @@ After=network.target
 Type=simple
 User=nobody
 EnvironmentFile=/etc/spdevice/spdevice.env
-ExecStart=/usr/bin/spdevice --headless \
-    --broker ${SPDEVICE_BROKER} \
-    --mode   ${SPDEVICE_MODE} \
-    --group  ${SPDEVICE_GROUP} \
-    --node   ${SPDEVICE_NODE} \
-    --interval ${SPDEVICE_INTERVAL}
+ExecStart=/usr/bin/spdevice
 Restart=on-failure
 RestartSec=5s
 StandardOutput=journal
